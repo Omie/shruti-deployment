@@ -1,0 +1,93 @@
+# Shruti
+#
+
+
+# Can't use postgres here until docker finds a way to figure out how to manage
+# dependencies
+#
+
+#postgres:
+#    image: postgres:9.4
+#    ports:
+#        - "5432:5432"
+#    volumes:
+#        - data:/var/lib/postgresql/data
+
+#flyway:
+#    image: omie/shruti-flyway
+#    external_links:
+#        - shruti_postgres_ext
+#    volumes:
+#        - sql:/flyway/sql
+
+shruti:
+    image: omie/shruti
+    ports:
+        - "9574:9574"
+    environment:
+        - SHRUTI_SERVER_HOST=0.0.0.0
+        - SHRUTI_SERVER_PORT=9574
+        - SHRUTI_CONN_STRING=postgres://postgres:@shruti_postgres_ext:5432/postgres?sslmode=disable
+        - USER=postgres
+        - SHRUTI_PUSHER_APPID=
+        - SHRUTI_PUSHER_KEY=
+        - SHRUTI_PUSHER_SECRET=
+        - SHRUTI_PUSHER_CHANNEL=shruti
+        - SHRUTI_PUSHER_EVENT=new-notification
+    external_links:
+        - shruti_postgres_ext
+
+ivonaservice:
+    image: omie/ivona-service
+    ports:
+        - "9575:9575"
+    environment:
+        - IVONA_ACCESSKEY=
+        - IVONA_SECRETKEY=
+        - IVONA_SERVICE_HOST=0.0.0.0
+        - IVONA_SERVICE_PORT=9575
+    volumes:
+        - /etc/ssl/certs:/etc/ssl/certs
+
+shruticlient:
+    image: omie/shruti-client
+    ports:
+        - "9576:9576"
+    environment:
+        - SHRUTI_API_URL=http://127.0.0.1:9574/
+        - SHRUTI_IVONA_URL=http://127.0.0.1:9575/
+        - SHRUTI_PUSHER_API_KEY=
+        - SHRUTI_CLIENT_HOST=0.0.0.0
+        - SHRUTI_CLIENT_PORT=9576
+        - SHRUTI_CLIENT_ID=webclient1234
+        - SHRUTI_PUSHER_CHANNEL=shruti
+        - SHRUTI_PUSHER_EVENT=new-notification
+        - SHRUTI_CLIENT_REFRESH_INTERVAL=30
+
+providerbbc:
+    image: omie/provider-bbc
+    environment:
+        - SHRUTI_SERVER=shruti:9574
+    links:
+        - shruti
+    volumes:
+        - /etc/ssl/certs:/etc/ssl/certs
+
+providerhn:
+    image: omie/provider-hn
+    environment:
+        - SHRUTI_SERVER=shruti:9574
+    links:
+        - shruti
+    volumes:
+        - /etc/ssl/certs:/etc/ssl/certs
+
+providerreddit:
+    image: omie/provider-reddit
+    environment:
+        - SHRUTI_SERVER=shruti:9574
+        - REDDIT_FEED_URL=
+    links:
+        - shruti
+    volumes:
+        - /etc/ssl/certs:/etc/ssl/certs
