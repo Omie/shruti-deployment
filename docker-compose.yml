@@ -50,6 +50,9 @@ shruti-cron:
     image: omie/shruti-cron
     ports:
         - "9577:9577"
+    environment:
+        - SHRUTI_CRON_HOST=0.0.0.0
+        - SHRUTI_CRON_PORT=9577
     volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - ./conf:/conf
