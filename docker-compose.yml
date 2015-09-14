@@ -1,27 +1,9 @@
 # Shruti
 #
 
-
-# Can't use postgres here until docker finds a way to figure out how to manage
-# dependencies
-#
-
-#postgres:
-#    image: postgres:9.4
-#    ports:
-#        - "5432:5432"
-#    volumes:
-#        - data:/var/lib/postgresql/data
-
-#flyway:
-#    image: omie/shruti-flyway
-#    external_links:
-#        - shruti_postgres_ext
-#    volumes:
-#        - sql:/flyway/sql
-
 shruti:
     image: omie/shruti
+    container_name: shruti-server
     ports:
         - "9574:9574"
     environment:
@@ -64,30 +46,11 @@ shruticlient:
         - SHRUTI_PUSHER_EVENT=new-notification
         - SHRUTI_CLIENT_REFRESH_INTERVAL=30
 
-providerbbc:
-    image: omie/provider-bbc
-    environment:
-        - SHRUTI_SERVER=shruti:9574
-    links:
-        - shruti
+shruti-cron:
+    image: omie/shruti-cron
+    ports:
+        - "9577:9577"
     volumes:
-        - /etc/ssl/certs:/etc/ssl/certs
-
-providerhn:
-    image: omie/provider-hn
-    environment:
-        - SHRUTI_SERVER=shruti:9574
-    links:
-        - shruti
-    volumes:
-        - /etc/ssl/certs:/etc/ssl/certs
-
-providerreddit:
-    image: omie/provider-reddit
-    environment:
-        - SHRUTI_SERVER=shruti:9574
-        - REDDIT_FEED_URL=
-    links:
-        - shruti
-    volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./conf:/conf
         - /etc/ssl/certs:/etc/ssl/certs

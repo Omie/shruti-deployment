@@ -8,6 +8,7 @@ docker pull omie/shruti-flyway
 docker pull omie/shruti
 docker pull omie/shruti-client
 docker pull omie/ivona-service
+docker pull omie/shruti-cron
 docker pull omie/provider-bbc
 docker pull omie/provider-hn
 docker pull omie/provider-reddit
